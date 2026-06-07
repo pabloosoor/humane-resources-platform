@@ -1,0 +1,3 @@
+rootProject.name = 'humane-resources-platform'
+include 'access-data'
+include 'backend'

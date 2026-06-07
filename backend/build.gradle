@@ -1,0 +1,4 @@
+dependencies {
+    implementation project(':access-data')
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+}

@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: humane-resources-platform
+  datasource:
+    url: jdbc:mysql://localhost:3307/humane_resources
+    username: hr_user
+    password: hr_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  main:
+    banner-mode: off
+    web-application-type: none
+
+logging:
+  level:
+    root: warn
+    com.uda: info
+    org.hibernate: warn
