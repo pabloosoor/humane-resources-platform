@@ -1,7 +1,0 @@
-package com.uda.accessdata.vacation;
-
-public enum VacationStatus {
-    PENDING,
-    APPROVED,
-    REJECTED
-}

@@ -1,7 +1,0 @@
-package com.uda.accessdata.bonus;
-
-public enum BonusType {
-    SENIORITY,
-    ATTENDANCE_BONUS,
-    PERFORMANCE
-}
