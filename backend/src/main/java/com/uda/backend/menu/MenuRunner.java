@@ -4,6 +4,7 @@ import com.uda.accessdata.bonus.BonusRecord;
 import com.uda.accessdata.bonus.BonusResult;
 import com.uda.accessdata.bonus.BonusType;
 import com.uda.accessdata.employee.Employee;
+import com.uda.accessdata.employee.EmployeeType;
 import com.uda.accessdata.presentismo.PresentismoResult;
 import com.uda.accessdata.vacation.VacationRequest;
 import com.uda.accessdata.vacation.VacationResult;
@@ -11,6 +12,8 @@ import com.uda.backend.bonus.BonusService;
 import com.uda.backend.employee.EmployeeService;
 import com.uda.backend.presentismo.PresentismoService;
 import com.uda.backend.vacation.VacationService;
+
+import java.math.BigDecimal;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -44,7 +47,7 @@ public class MenuRunner {
                 case 1 -> menuVacaciones();
                 case 2 -> menuBonos();
                 case 3 -> menuPresentismo();
-                case 4 -> listarEmpleados();
+                case 4 -> menuEmpleados();
                 case 0 -> running = false;
                 default -> System.out.println("  Opción inválida.\n");
             }
@@ -180,6 +183,96 @@ public class MenuRunner {
         }
     }
 
+    private void menuEmpleados() {
+        boolean volver = false;
+        while (!volver) {
+            System.out.println("\n── EMPLEADOS ──────────────────────────────");
+            System.out.println("  1. Listar empleados");
+            System.out.println("  2. Crear empleado");
+            System.out.println("  3. Editar empleado");
+            System.out.println("  4. Desactivar empleado");
+            System.out.println("  0. Volver");
+            System.out.print("  Opción: ");
+            switch (readInt()) {
+                case 1 -> listarEmpleados();
+                case 2 -> crearEmpleado();
+                case 3 -> editarEmpleado();
+                case 4 -> desactivarEmpleado();
+                case 0 -> volver = true;
+                default -> System.out.println("  Opción inválida.");
+            }
+        }
+    }
+
+    private void crearEmpleado() {
+        System.out.println("\n  -- Nuevo empleado --");
+        try {
+            System.out.print("  Nombre       : ");
+            String nombre = scanner.nextLine().trim();
+            System.out.print("  Apellido     : ");
+            String apellido = scanner.nextLine().trim();
+            System.out.print("  Email        : ");
+            String email = scanner.nextLine().trim();
+            LocalDate fechaIngreso = readFecha("  Fecha ingreso (YYYY-MM-DD): ");
+            EmployeeType tipo = readTipoEmpleado();
+            BigDecimal salario = readDecimal("  Salario base  : ");
+
+            Employee e = employeeService.crear(nombre, apellido, email, fechaIngreso, tipo, salario);
+            System.out.println("\n  Empleado creado con ID: " + e.getId());
+        } catch (Exception e) {
+            System.out.println("  Error: " + e.getMessage());
+        }
+    }
+
+    private void editarEmpleado() {
+        listarEmpleados();
+        try {
+            Long id = readLong("  ID del empleado a editar: ");
+            Employee actual = employeeService.buscarPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + id));
+
+            System.out.println("  (Enter para mantener el valor actual)");
+
+            System.out.print("  Nombre    [" + actual.getNombre() + "]: ");
+            String nombre = leerODefecto(actual.getNombre());
+
+            System.out.print("  Apellido  [" + actual.getApellido() + "]: ");
+            String apellido = leerODefecto(actual.getApellido());
+
+            System.out.print("  Email     [" + actual.getEmail() + "]: ");
+            String email = leerODefecto(actual.getEmail());
+
+            System.out.print("  Tipo      [" + actual.getTipoEmpleado() + "] (FULL_TIME/PART_TIME/CONTRACTOR): ");
+            String tipoInput = scanner.nextLine().trim();
+            EmployeeType tipo = tipoInput.isEmpty() ? actual.getTipoEmpleado() : EmployeeType.valueOf(tipoInput.toUpperCase());
+
+            System.out.print("  Salario   [" + actual.getSalarioBase() + "]: ");
+            String salarioInput = scanner.nextLine().trim();
+            BigDecimal salario = salarioInput.isEmpty() ? actual.getSalarioBase() : new BigDecimal(salarioInput);
+
+            employeeService.actualizar(id, nombre, apellido, email, tipo, salario);
+            System.out.println("  Empleado actualizado.");
+        } catch (Exception e) {
+            System.out.println("  Error: " + e.getMessage());
+        }
+    }
+
+    private void desactivarEmpleado() {
+        listarEmpleados();
+        try {
+            Long id = readLong("  ID del empleado a desactivar: ");
+            System.out.print("  Confirmar (s/n): ");
+            if (!scanner.nextLine().trim().equalsIgnoreCase("s")) {
+                System.out.println("  Cancelado.");
+                return;
+            }
+            employeeService.desactivar(id);
+            System.out.println("  Empleado desactivado.");
+        } catch (Exception e) {
+            System.out.println("  Error: " + e.getMessage());
+        }
+    }
+
     private void printMenuPrincipal() {
         System.out.println("\n========================================");
         System.out.println("         HR Platform — UDA");
@@ -187,7 +280,7 @@ public class MenuRunner {
         System.out.println("  1. Vacaciones");
         System.out.println("  2. Bonos");
         System.out.println("  3. Presentismo");
-        System.out.println("  4. Ver empleados");
+        System.out.println("  4. Empleados");
         System.out.println("  0. Salir");
         System.out.print("  Opción: ");
     }
@@ -241,5 +334,32 @@ public class MenuRunner {
             if (input.matches("\\d{4}-\\d{2}")) return input;
             System.out.println("  Formato inválido. Use YYYY-MM.");
         }
+    }
+
+    private EmployeeType readTipoEmpleado() {
+        while (true) {
+            System.out.print("  Tipo (FULL_TIME / PART_TIME / CONTRACTOR): ");
+            try {
+                return EmployeeType.valueOf(scanner.nextLine().trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("  Tipo inválido. Opciones: FULL_TIME, PART_TIME, CONTRACTOR.");
+            }
+        }
+    }
+
+    private BigDecimal readDecimal(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return new BigDecimal(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("  Ingrese un número válido.");
+            }
+        }
+    }
+
+    private String leerODefecto(String valorActual) {
+        String input = scanner.nextLine().trim();
+        return input.isEmpty() ? valorActual : input;
     }
 }
