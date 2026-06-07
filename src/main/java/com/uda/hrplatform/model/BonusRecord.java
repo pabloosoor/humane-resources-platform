@@ -1,4 +1,4 @@
-package com.uda.accessdata.bonus;
+package com.uda.hrplatform.model;
 
 import java.math.BigDecimal;
 

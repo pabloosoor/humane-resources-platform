@@ -1,4 +1,4 @@
-package com.uda.accessdata.vacation;
+package com.uda.hrplatform.model;
 
 import java.time.LocalDate;
 

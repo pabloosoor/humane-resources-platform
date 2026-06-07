@@ -1,7 +1,7 @@
 package com.uda.accessdata.vacation;
 
 public record VacationResult(
-        boolean aprobada,
-        String mensaje,
-        int diasRestantes
+        boolean approved,
+        String message,
+        int remainingDays
 ) {}

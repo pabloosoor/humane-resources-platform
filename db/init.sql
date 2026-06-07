@@ -1,93 +1,48 @@
-CREATE DATABASE IF NOT EXISTS humane_resources;
-USE humane_resources;
-
--- --------------------------------------------------------
--- EMPLOYEES
--- --------------------------------------------------------
-CREATE TABLE employees (
-    id               BIGINT          NOT NULL AUTO_INCREMENT,
-    nombre           VARCHAR(100)    NOT NULL,
-    apellido         VARCHAR(100)    NOT NULL,
-    email            VARCHAR(150)    NOT NULL UNIQUE,
-    fecha_ingreso    DATE            NOT NULL,
-    tipo_empleado    ENUM(
-                         'FULL_TIME',
-                         'PART_TIME',
-                         'CONTRACTOR'
-                     )               NOT NULL,
-    salario_base     DECIMAL(12, 2)  NOT NULL,
-    dias_vacaciones  INT             NOT NULL DEFAULT 14,
-    activo           BOOLEAN         NOT NULL DEFAULT TRUE,
-    created_at       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS employees (
+    id            BIGINT         NOT NULL AUTO_INCREMENT,
+    first_name    VARCHAR(100)   NOT NULL,
+    last_name     VARCHAR(100)   NOT NULL,
+    email         VARCHAR(150)   NOT NULL UNIQUE,
+    hire_date     DATE           NOT NULL,
+    employee_type VARCHAR(50)    NOT NULL,
+    base_salary   DECIMAL(12,2)  NOT NULL,
+    vacation_days INT            NOT NULL DEFAULT 14,
+    active        BOOLEAN        NOT NULL DEFAULT TRUE,
     PRIMARY KEY (id)
 );
 
--- --------------------------------------------------------
--- VACATION REQUESTS
--- --------------------------------------------------------
-CREATE TABLE vacation_requests (
-    id               BIGINT          NOT NULL AUTO_INCREMENT,
-    employee_id      BIGINT          NOT NULL,
-    fecha_inicio     DATE            NOT NULL,
-    fecha_fin        DATE            NOT NULL,
-    dias_solicitados INT             NOT NULL,
-    estado           ENUM(
-                         'PENDIENTE',
-                         'APROBADA',
-                         'RECHAZADA'
-                     )               NOT NULL DEFAULT 'PENDIENTE',
-    motivo           VARCHAR(255),
-    created_at       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_vacation_employee
-        FOREIGN KEY (employee_id) REFERENCES employees (id)
-        ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS vacation_requests (
+    id             BIGINT       NOT NULL AUTO_INCREMENT,
+    employee_id    BIGINT       NOT NULL,
+    start_date     DATE         NOT NULL,
+    end_date       DATE         NOT NULL,
+    requested_days INT          NOT NULL,
+    status         VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
+    reason         VARCHAR(500),
+    PRIMARY KEY (id)
 );
 
--- --------------------------------------------------------
--- BONUS RECORDS
--- --------------------------------------------------------
-CREATE TABLE bonus_records (
-    id               BIGINT          NOT NULL AUTO_INCREMENT,
-    employee_id      BIGINT          NOT NULL,
-    tipo_bono        ENUM(
-                         'ANTIGUEDAD',
-                         'PRESENTISMO',
-                         'PERFORMANCE'
-                     )               NOT NULL,
-    monto            DECIMAL(12, 2)  NOT NULL,
-    periodo          VARCHAR(7)      NOT NULL,  -- formato: YYYY-MM
-    created_at       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_bonus_employee
-        FOREIGN KEY (employee_id) REFERENCES employees (id)
-        ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS bonus_records (
+    id          BIGINT         NOT NULL AUTO_INCREMENT,
+    employee_id BIGINT         NOT NULL,
+    bonus_type  VARCHAR(50)    NOT NULL,
+    amount      DECIMAL(12,2)  NOT NULL,
+    period      VARCHAR(7)     NOT NULL,
+    PRIMARY KEY (id)
 );
 
--- --------------------------------------------------------
--- ATTENDANCE RECORDS (para presentismo)
--- --------------------------------------------------------
-CREATE TABLE attendance_records (
-    id                   BIGINT      NOT NULL AUTO_INCREMENT,
-    employee_id          BIGINT      NOT NULL,
-    fecha                DATE        NOT NULL,
-    presente             BOOLEAN     NOT NULL DEFAULT TRUE,
-    ausencia_justificada BOOLEAN     NOT NULL DEFAULT FALSE,
-    created_at           TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS attendance_records (
+    id                BIGINT   NOT NULL AUTO_INCREMENT,
+    employee_id       BIGINT   NOT NULL,
+    record_date       DATE     NOT NULL,
+    present           BOOLEAN  NOT NULL DEFAULT TRUE,
+    justified_absence BOOLEAN  NOT NULL DEFAULT FALSE,
     PRIMARY KEY (id),
-    CONSTRAINT fk_attendance_employee
-        FOREIGN KEY (employee_id) REFERENCES employees (id)
-        ON DELETE CASCADE,
-    CONSTRAINT uq_attendance_employee_fecha
-        UNIQUE (employee_id, fecha)
+    UNIQUE KEY uq_attendance (employee_id, record_date)
 );
 
--- --------------------------------------------------------
--- SEED DATA (empleados de prueba)
--- --------------------------------------------------------
-INSERT INTO employees (nombre, apellido, email, fecha_ingreso, tipo_empleado, salario_base, dias_vacaciones)
-VALUES
-    ('Carlos',   'García',   'carlos.garcia@uda.edu.ar',   '2019-03-15', 'FULL_TIME',  150000.00, 21),
-    ('Lucía',    'Martínez', 'lucia.martinez@uda.edu.ar',  '2023-07-01', 'FULL_TIME',  120000.00, 14),
-    ('Marcos',   'López',    'marcos.lopez@uda.edu.ar',    '2015-01-10', 'PART_TIME',   80000.00, 28),
-    ('Valentina','Ríos',     'valentina.rios@uda.edu.ar',  '2024-02-20', 'CONTRACTOR',  95000.00, 14);
+INSERT IGNORE INTO employees (id, first_name, last_name, email, hire_date, employee_type, base_salary, vacation_days, active) VALUES
+(1, 'Ana',    'Gomez',    'ana.gomez@uda.ar',     '2019-03-01', 'FULL_TIME',  75000.00, 14, TRUE),
+(2, 'Carlos', 'Perez',    'carlos.perez@uda.ar',  '2021-06-15', 'PART_TIME',  45000.00, 14, TRUE),
+(3, 'Laura',  'Martinez', 'laura.martinez@uda.ar','2018-01-10', 'FULL_TIME',  90000.00, 14, TRUE),
+(4, 'Diego',  'Lopez',    'diego.lopez@uda.ar',   '2022-11-20', 'CONTRACTOR', 60000.00, 14, TRUE);

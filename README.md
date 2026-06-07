@@ -1,10 +1,10 @@
 # HR Platform — UDA
 
-Plataforma de recursos humanos desarrollada en Java 17 con JDBC puro y MySQL. Aplicación de consola con arquitectura multi-módulo Gradle.
+REST API de recursos humanos desarrollada en Java 17 puro con JDBC y MySQL. Sin frameworks — usa el `HttpServer` del JDK y Gson para JSON.
 
-Aplica los principios SOLID:
-- **OCP (Open/Closed Principle):** las reglas de vacaciones, bonos y presentismo son interfaces. Para agregar una nueva regla se crea una nueva clase sin modificar las existentes.
-- **SRP (Single Responsibility Principle):** cada clase tiene una única razón de cambio. El controlador de menú no calcula, los servicios no persisten, los repositorios no tienen lógica de negocio.
+Aplica principios SOLID:
+- **OCP:** las reglas de vacaciones y bonos son interfaces (`VacationPolicy`, `BonusCalculator`). Para agregar una nueva regla se crea una nueva clase sin modificar las existentes.
+- **SRP:** cada clase tiene una única responsabilidad. El controller maneja HTTP, el service orquesta la lógica, el repository persiste datos.
 
 ---
 
@@ -12,29 +12,28 @@ Aplica los principios SOLID:
 
 - Java 17
 - Docker Desktop
-- IntelliJ IDEA (recomendado)
-- MySQL Workbench (opcional, para inspeccionar la base de datos)
+- IntelliJ IDEA
 
 ---
 
-## Levantar la aplicación desde cero
+## Levantar la aplicación
 
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/pabloosoor/humane-resources-platform.git
 cd humane-resources-platform
 ```
 
-### 2. Levantar la base de datos con Docker
+### 2. Levantar MySQL con Docker
 
 ```bash
 docker compose up -d
 ```
 
-Esto descarga la imagen de MySQL 8, crea la base `humane_resources`, las tablas y carga datos de prueba automáticamente desde `db/init.sql`.
+Crea la base `humane_resources`, las tablas y carga 4 empleados de prueba desde `db/init.sql`.
 
-Para verificar que el contenedor está corriendo:
+Para verificar que está listo:
 
 ```bash
 docker compose ps
@@ -42,138 +41,193 @@ docker compose ps
 
 El estado debe decir `healthy`.
 
-### 3. Verificar la configuración de base de datos
-
-El archivo `backend/src/main/resources/db.properties` contiene la conexión:
-
-```properties
-db.url=jdbc:mysql://localhost:3307/humane_resources
-db.user=hr_user
-db.password=hr_password
-```
-
-El puerto es `3307` (no el 3306 estándar) para no colisionar con instalaciones locales de MySQL.
-
-### 4. Abrir en IntelliJ IDEA
+### 3. Abrir en IntelliJ IDEA
 
 - `File → Open` → seleccionar la carpeta raíz del proyecto
-- IntelliJ detecta el `build.gradle` y pregunta si abrir como proyecto Gradle → confirmar
-- En el panel `Gradle` → hacer click en el ícono de recarga para descargar dependencias
+- IntelliJ detecta el `build.gradle` → confirmar como proyecto Gradle
+- Panel `Gradle` → botón de recarga para descargar dependencias (Gson + MySQL connector)
 
-### 5. Correr la aplicación
+### 4. Correr la aplicación
 
-Navegar a `backend/src/main/java/com/uda/backend/Main.java` → click derecho → **Run 'Main.main()'**
+Navegar a `src/main/java/com/uda/hrplatform/Main.java` → click derecho → **Run 'Main.main()'**
+
+La app queda escuchando en `http://localhost:8080`.
 
 ---
 
-## Uso del menú
+## Endpoints
 
-Al correr la aplicación aparece:
+### Employees
 
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| GET | `/api/employees` | Listar empleados activos |
+| GET | `/api/employees/{id}` | Obtener empleado por ID |
+| POST | `/api/employees` | Crear empleado |
+| PUT | `/api/employees/{id}` | Actualizar empleado |
+| DELETE | `/api/employees/{id}` | Desactivar empleado (soft delete) |
+
+**POST /api/employees — body:**
+```json
+{
+  "firstName": "Ana",
+  "lastName": "Gomez",
+  "email": "ana@uda.ar",
+  "hireDate": "2020-01-15",
+  "employeeType": "FULL_TIME",
+  "baseSalary": 75000.00
+}
 ```
-========================================
-         HR Platform — UDA
-========================================
-  1. Vacaciones
-  2. Bonos
-  3. Presentismo
-  4. Ver empleados
-  0. Salir
-  Opción:
+
+**PUT /api/employees/{id} — body (solo los campos a cambiar):**
+```json
+{
+  "baseSalary": 85000.00
+}
 ```
 
-### Vacaciones
+---
 
-Permite solicitar días de vacaciones para un empleado. El sistema valida si tiene saldo disponible y registra la solicitud como APROBADA o RECHAZADA. Si es aprobada, descuenta los días del saldo del empleado en la base de datos.
+### Vacations
 
-### Bonos
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| POST | `/api/employees/{id}/vacations` | Solicitar vacaciones |
+| GET | `/api/employees/{id}/vacations` | Historial de vacaciones |
 
-Calcula el bono por antigüedad: `años trabajados x 1% del salario base`. Valida que no se calcule dos veces el mismo bono para el mismo período.
+**POST body:**
+```json
+{
+  "startDate": "2025-02-01",
+  "endDate": "2025-02-10",
+  "requestedDays": 10,
+  "reason": "Annual leave"
+}
+```
 
-### Presentismo
+---
 
-Primero registrar asistencias del mes con la opción 2 del submenú. Luego calcular con la opción 1. La regla es todo o nada: sin ausencias injustificadas en el mes el empleado recibe el 10% del salario base. Con al menos una ausencia injustificada no recibe bono.
+### Bonus
+
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| POST | `/api/employees/{id}/bonus` | Calcular bono |
+| GET | `/api/employees/{id}/bonus` | Historial de bonos |
+
+**POST body:**
+```json
+{
+  "bonusType": "SENIORITY",
+  "period": "2025-01"
+}
+```
+
+`bonusType` puede ser: `SENIORITY`, `ATTENDANCE_BONUS`, `PERFORMANCE`.
+
+---
+
+### Attendance
+
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| POST | `/api/employees/{id}/attendance` | Registrar asistencia de un día |
+| GET | `/api/employees/{id}/attendance?period=2025-01` | Ver asistencias del período |
+| POST | `/api/employees/{id}/attendance/bonus?period=2025-01` | Calcular bono de presentismo |
+
+**POST /attendance body:**
+```json
+{
+  "date": "2025-01-15",
+  "present": true,
+  "justifiedAbsence": false
+}
+```
+
+---
+
+## Reglas de negocio
+
+**Vacaciones:** valida que el empleado tenga saldo disponible. Si se aprueba, descuenta los días automáticamente.
+
+**Bono por antigüedad:** `años trabajados × 1% del salario base`. No se puede calcular dos veces el mismo período.
+
+**Bono de presentismo:** 10% del salario base si no hay ausencias injustificadas en el mes. Con una o más ausencias injustificadas el bono es cero.
 
 ---
 
 ## Comandos Docker útiles
 
 ```bash
-docker compose up -d        # levantar contenedor
-docker compose down         # bajar (los datos persisten)
+docker compose up -d        # levantar
+docker compose down         # bajar (datos persisten)
 docker compose down -v      # bajar y borrar todos los datos
-docker compose logs -f      # ver logs en tiempo real
+docker compose logs -f      # ver logs
 ```
 
 ---
 
 ## Conexión con MySQL Workbench
 
-| Campo    | Valor               |
-|----------|---------------------|
-| Hostname | 127.0.0.1           |
-| Port     | 3307                |
-| Username | hr_user             |
-| Password | hr_password         |
-| Schema   | humane_resources    |
+| Campo    | Valor            |
+|----------|------------------|
+| Hostname | 127.0.0.1        |
+| Port     | 3307             |
+| Username | hr_user          |
+| Password | hr_password      |
+| Schema   | humane_resources |
 
 ---
 
 ## Estructura del proyecto
 
 ```
-humane-resources-platform/
-├── docker-compose.yml
-├── db/
-│   └── init.sql                  schema y datos de prueba
-├── access-data/                  modulo de definiciones (sin logica)
-│   └── src/main/java/com/uda/accessdata/
-│       ├── employee/
-│       │   ├── Employee.java           POJO del empleado
-│       │   ├── EmployeeType.java       enum FULL_TIME / PART_TIME / CONTRACTOR
-│       │   └── EmployeeRepository.java interfaz de acceso a datos
-│       ├── vacation/
-│       │   ├── VacationRequest.java    POJO de solicitud
-│       │   ├── VacationStatus.java     enum PENDIENTE / APROBADA / RECHAZADA
-│       │   ├── VacationRepository.java interfaz de acceso a datos
-│       │   ├── VacationResult.java     record con el resultado de la operacion
-│       │   └── VacationPolicy.java     interfaz OCP para reglas de vacaciones
-│       ├── bonus/
-│       │   ├── BonusRecord.java        POJO del registro de bono
-│       │   ├── BonusType.java          enum ANTIGUEDAD / PRESENTISMO / PERFORMANCE
-│       │   ├── BonusRepository.java    interfaz de acceso a datos
-│       │   ├── BonusResult.java        record con el resultado del calculo
-│       │   └── BonusCalculator.java    interfaz OCP para calculadoras de bono
-│       └── presentismo/
-│           ├── AttendanceRecord.java       POJO de asistencia
-│           ├── AttendanceRepository.java   interfaz de acceso a datos
-│           ├── PresentismoResult.java      record con el resultado
-│           └── PresentismoCalculator.java  interfaz OCP para la regla
-└── backend/                      modulo que ejecuta y conecta todo
-    └── src/main/java/com/uda/backend/
-        ├── Main.java                     punto de entrada, ensambla dependencias
-        ├── config/
-        │   └── ConnectionManager.java    maneja la conexion JDBC
-        ├── employee/
-        │   ├── EmployeeJdbcRepository.java  implementacion JDBC
-        │   └── EmployeeService.java         logica de consulta de empleados
-        ├── vacation/
-        │   ├── VacationJdbcRepository.java
-        │   ├── VacationService.java
-        │   ├── VacationPolicyRegistry.java  registra las politicas disponibles
-        │   └── policy/
-        │       └── StandardVacationPolicy.java
-        ├── bonus/
-        │   ├── BonusJdbcRepository.java
-        │   ├── BonusService.java
-        │   ├── BonusCalculatorRegistry.java
-        │   └── calculator/
-        │       └── AntiguedadBonusCalculator.java
-        ├── presentismo/
-        │   ├── AttendanceJdbcRepository.java
-        │   ├── PresentismoService.java
-        │   └── calculator/
-        │       └── StandardPresentismoCalculator.java
-        └── menu/
-            └── MenuRunner.java           menu de terminal
+src/main/java/com/uda/hrplatform/
+├── Main.java                        punto de entrada, ensambla dependencias y rutas
+├── model/                           POJOs y enums del dominio
+│   ├── Employee.java
+│   ├── EmployeeType.java            FULL_TIME | PART_TIME | CONTRACTOR
+│   ├── VacationRequest.java
+│   ├── VacationStatus.java          PENDING | APPROVED | REJECTED
+│   ├── VacationApproval.java        resultado interno de la política
+│   ├── BonusRecord.java
+│   ├── BonusType.java               SENIORITY | ATTENDANCE_BONUS | PERFORMANCE
+│   └── AttendanceRecord.java
+├── dto/                             objetos de entrada de la API
+│   ├── CreateEmployeeRequest.java
+│   ├── UpdateEmployeeRequest.java
+│   ├── NewVacationRequest.java
+│   ├── CalculateBonusRequest.java
+│   └── RegisterAttendanceRequest.java
+├── repository/                      interfaces de acceso a datos
+│   ├── EmployeeRepository.java
+│   ├── VacationRepository.java
+│   ├── BonusRepository.java
+│   ├── AttendanceRepository.java
+│   └── impl/                        implementaciones JDBC
+│       ├── EmployeeJdbcRepository.java
+│       ├── VacationJdbcRepository.java
+│       ├── BonusJdbcRepository.java
+│       └── AttendanceJdbcRepository.java
+├── service/                         lógica de negocio
+│   ├── EmployeeService.java
+│   ├── VacationService.java
+│   ├── BonusService.java
+│   ├── AttendanceBonusService.java
+│   ├── policy/                      OCP — reglas de vacaciones
+│   │   ├── VacationPolicy.java      interfaz
+│   │   └── StandardVacationPolicy.java
+│   └── calculator/                  OCP — cálculo de bonos
+│       ├── BonusCalculator.java     interfaz
+│       ├── SeniorityBonusCalculator.java
+│       ├── AttendanceBonusCalculator.java  interfaz
+│       └── StandardAttendanceBonusCalculator.java
+├── controller/                      manejo de requests HTTP
+│   ├── EmployeeController.java
+│   ├── VacationController.java
+│   ├── BonusController.java
+│   └── AttendanceController.java
+└── utils/
+    ├── ConnectionManager.java       conexión JDBC desde db.properties
+    ├── Router.java                  enrutador con soporte de path variables
+    └── HttpUtils.java               helpers JSON (Gson) y query params
 ```

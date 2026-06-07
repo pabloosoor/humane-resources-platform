@@ -1,4 +1,4 @@
-package com.uda.accessdata.employee;
+package com.uda.hrplatform.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

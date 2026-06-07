@@ -1,21 +1,21 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
-allprojects {
-    group = 'com.uda'
-    version = '1.0-SNAPSHOT'
+group = 'com.uda'
+version = '1.0.0'
+java.sourceCompatibility = JavaVersion.VERSION_17
+
+application {
+    mainClass = 'com.uda.hrplatform.Main'
 }
 
-subprojects {
-    apply plugin: 'java'
+repositories {
+    mavenCentral()
+}
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    repositories {
-        mavenCentral()
-    }
+dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
 }

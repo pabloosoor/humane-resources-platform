@@ -1,4 +1,4 @@
-package com.uda.accessdata.vacation;
+package com.uda.hrplatform.model;
 
 public enum VacationStatus {
     PENDING,

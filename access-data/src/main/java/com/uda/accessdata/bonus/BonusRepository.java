@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface BonusRepository {
     void save(BonusRecord record);
-    boolean exists(Long employeeId, BonusType tipo, String periodo);
+    boolean exists(Long employeeId, BonusType type, String period);
     List<BonusRecord> findByEmployeeId(Long employeeId);
 }
