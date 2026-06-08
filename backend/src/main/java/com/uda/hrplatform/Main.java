@@ -15,6 +15,6 @@ public class Main {
         server.createContext("/", new Routes(config).build());
         server.start();
 
-        System.out.println("HR Platform running on http://localhost:8080");
+        System.out.println("Humas Resources Platform is running on http://localhost:8080");
     }
 }
