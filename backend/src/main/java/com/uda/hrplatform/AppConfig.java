@@ -14,6 +14,11 @@ import java.util.List;
 // Para agregar una funcionalidad: crear su repo, service y controller acá.
 public class AppConfig {
 
+    private final EmployeeService employeeService;
+    private final VacationService vacationService;
+    private final BonusService bonusService;
+    private final AttendanceBonusService attendanceBonusService;
+
     private final EmployeeController employeeController;
     private final VacationController vacationController;
     private final BonusController bonusController;
@@ -29,21 +34,28 @@ public class AppConfig {
         var attendanceRepo = new AttendanceJdbcRepository(connectionManager);
 
         // Servicios — inyectan repos y estrategias OCP
-        var employeeService   = new EmployeeService(employeeRepo);
-        var vacationService   = new VacationService(employeeRepo, vacationRepo,
+        this.employeeService      = new EmployeeService(employeeRepo);
+        this.vacationService      = new VacationService(employeeRepo, vacationRepo,
                 List.of(new StandardVacationPolicy()));
-        var bonusService      = new BonusService(employeeRepo, bonusRepo,
+        this.bonusService         = new BonusService(employeeRepo, bonusRepo,
                 List.of(new SeniorityBonusCalculator()));
-        var attendanceService = new AttendanceBonusService(attendanceRepo, employeeRepo, bonusRepo,
+        this.attendanceBonusService = new AttendanceBonusService(attendanceRepo, employeeRepo, bonusRepo,
                 new StandardAttendanceBonusCalculator());
 
         // Controladores — inyectan servicios
         this.employeeController   = new EmployeeController(employeeService);
         this.vacationController   = new VacationController(vacationService);
         this.bonusController      = new BonusController(bonusService);
-        this.attendanceController = new AttendanceController(attendanceService);
+        this.attendanceController = new AttendanceController(attendanceBonusService);
     }
 
+    // Servicios — usados por el menu de terminal
+    public EmployeeService getEmployeeService()           { return employeeService; }
+    public VacationService getVacationService()           { return vacationService; }
+    public BonusService getBonusService()                 { return bonusService; }
+    public AttendanceBonusService getAttendanceBonusService() { return attendanceBonusService; }
+
+    // Controladores — usados por la API REST
     public EmployeeController getEmployeeController()     { return employeeController; }
     public VacationController getVacationController()     { return vacationController; }
     public BonusController getBonusController()           { return bonusController; }

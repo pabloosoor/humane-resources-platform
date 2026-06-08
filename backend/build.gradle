@@ -10,3 +10,10 @@ dependencies {
     implementation project(':access-data')
     implementation 'com.google.code.gson:gson:2.10.1'
 }
+
+// Tarea para correr el menu de terminal: ./gradlew :backend:runMenu
+tasks.register('runMenu', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.uda.hrplatform.menu.MenuMain'
+    standardInput = System.in
+}
