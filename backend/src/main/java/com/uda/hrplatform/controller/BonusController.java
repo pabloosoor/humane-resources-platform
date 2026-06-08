@@ -16,6 +16,7 @@ public class BonusController {
         this.service = service;
     }
 
+    // POST /api/employees/{id}/bonus — calculates and records a bonus for the employee
     public void calculate(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));
@@ -26,6 +27,7 @@ public class BonusController {
         }
     }
 
+    // GET /api/employees/{id}/bonus — returns all bonus records for the employee
     public void findByEmployee(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));

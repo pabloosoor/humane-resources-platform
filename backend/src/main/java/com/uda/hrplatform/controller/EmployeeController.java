@@ -17,10 +17,12 @@ public class EmployeeController {
         this.service = service;
     }
 
+    // GET /api/employees — returns all active employees
     public void findAll(HttpExchange exchange, Map<String, String> vars) throws IOException {
         HttpUtils.sendJson(exchange, 200, service.findActives());
     }
 
+    // GET /api/employees/{id} — returns a single employee or 404 if not found
     public void findById(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long id = Long.parseLong(vars.get("id"));
@@ -30,6 +32,7 @@ public class EmployeeController {
         }
     }
 
+    // POST /api/employees — creates a new employee from the request body
     public void create(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             CreateEmployeeRequest req = HttpUtils.readBody(exchange, CreateEmployeeRequest.class);
@@ -39,6 +42,7 @@ public class EmployeeController {
         }
     }
 
+    // PUT /api/employees/{id} — updates only the fields present in the body
     public void update(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long id = Long.parseLong(vars.get("id"));
@@ -49,6 +53,7 @@ public class EmployeeController {
         }
     }
 
+    // DELETE /api/employees/{id} — soft deletes the employee (sets active = false)
     public void deactivate(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long id = Long.parseLong(vars.get("id"));

@@ -16,6 +16,7 @@ public class VacationController {
         this.service = service;
     }
 
+    // POST /api/employees/{id}/vacations — submits a vacation request for the employee
     public void request(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));
@@ -26,6 +27,7 @@ public class VacationController {
         }
     }
 
+    // GET /api/employees/{id}/vacations — returns all vacation requests for the employee
     public void findByEmployee(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));

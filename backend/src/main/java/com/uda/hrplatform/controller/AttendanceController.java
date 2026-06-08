@@ -16,6 +16,7 @@ public class AttendanceController {
         this.service = service;
     }
 
+    // POST /api/employees/{id}/attendance — registers a single attendance day
     public void register(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));
@@ -26,6 +27,7 @@ public class AttendanceController {
         }
     }
 
+    // GET /api/employees/{id}/attendance?period=YYYY-MM — returns attendance records for the period
     public void findByPeriod(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));
@@ -36,6 +38,7 @@ public class AttendanceController {
         }
     }
 
+    // POST /api/employees/{id}/attendance/bonus?period=YYYY-MM — calculates the attendance bonus
     public void calculateBonus(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long employeeId = Long.parseLong(vars.get("id"));
