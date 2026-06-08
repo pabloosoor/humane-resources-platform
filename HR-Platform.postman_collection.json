@@ -1,0 +1,279 @@
+{
+  "info": {
+    "name": "HR Platform API",
+    "description": "Coleccion de endpoints para el HR Platform. Levantar el backend desde Main.java antes de usar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "Get all employees",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees"]
+            },
+            "description": "Retorna todos los empleados activos."
+          }
+        },
+        {
+          "name": "Get employee by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}"]
+            },
+            "description": "Retorna un empleado por su ID."
+          }
+        },
+        {
+          "name": "Create employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Perez\",\n  \"email\": \"juan.perez@empresa.com\",\n  \"hireDate\": \"2022-03-01\",\n  \"employeeType\": \"FULL_TIME\",\n  \"baseSalary\": 80000.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees"]
+            },
+            "description": "Crea un nuevo empleado. employeeType: FULL_TIME | PART_TIME | CONTRACTOR."
+          }
+        },
+        {
+          "name": "Update employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseSalary\": 90000.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}"]
+            },
+            "description": "Actualiza solo los campos enviados. Los demas se mantienen sin cambios."
+          }
+        },
+        {
+          "name": "Deactivate employee",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}"]
+            },
+            "description": "Soft delete: marca al empleado como inactivo sin borrar sus datos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vacations",
+      "item": [
+        {
+          "name": "Request vacation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2025-07-01\",\n  \"endDate\": \"2025-07-10\",\n  \"requestedDays\": 10,\n  \"reason\": \"Vacaciones anuales\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/vacations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "vacations"]
+            },
+            "description": "Solicita vacaciones para el empleado. La politica valida el saldo disponible."
+          }
+        },
+        {
+          "name": "Get vacations by employee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/vacations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "vacations"]
+            },
+            "description": "Retorna el historial de solicitudes de vacaciones del empleado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bonus",
+      "item": [
+        {
+          "name": "Calculate seniority bonus",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bonusType\": \"SENIORITY\",\n  \"period\": \"2025-06\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/bonus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "bonus"]
+            },
+            "description": "Calcula el bono de antiguedad: 1% del salario base por cada anio trabajado. bonusType: SENIORITY | PERFORMANCE."
+          }
+        },
+        {
+          "name": "Get bonus by employee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/bonus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "bonus"]
+            },
+            "description": "Retorna el historial de bonos calculados para el empleado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Register attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2025-06-09\",\n  \"present\": true,\n  \"justifiedAbsence\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "attendance"]
+            },
+            "description": "Registra la asistencia de un dia. No se puede registrar dos veces el mismo dia."
+          }
+        },
+        {
+          "name": "Get attendance by period",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/attendance?period=2025-06",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "attendance"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "2025-06"
+                }
+              ]
+            },
+            "description": "Retorna los registros de asistencia del empleado en el periodo indicado (formato YYYY-MM)."
+          }
+        },
+        {
+          "name": "Calculate attendance bonus",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{{employeeId}}/attendance/bonus?period=2025-06",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "{{employeeId}}", "attendance", "bonus"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "2025-06"
+                }
+              ]
+            },
+            "description": "Calcula el bono de presentismo del periodo. 10% del salario si no hay ausencias injustificadas, 0 si las hay."
+          }
+        }
+      ]
+    }
+  ]
+}
