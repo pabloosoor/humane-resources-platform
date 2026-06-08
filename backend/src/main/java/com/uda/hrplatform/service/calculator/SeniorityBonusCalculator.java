@@ -14,7 +14,7 @@ public class SeniorityBonusCalculator implements BonusCalculator {
         return type == BonusType.SENIORITY;
     }
 
-    // 1% of base salary per year of seniority.
+    // 1% del salario base por cada año de antigüedad.
     @Override
     public BigDecimal calculate(Employee employee, String period) {
         int years = Period.between(employee.getHireDate(), LocalDate.now()).getYears();

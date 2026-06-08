@@ -22,7 +22,7 @@ public class VacationService {
         this.policies = policies;
     }
 
-    // Applies the matching policy, saves the request, and deducts days if approved.
+    // Aplica la política correspondiente, guarda la solicitud y descuenta días si fue aprobada.
     public VacationRequest request(Long employeeId, NewVacationRequest req) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found: " + employeeId));
@@ -43,7 +43,7 @@ public class VacationService {
         return vacationRepository.save(vacationRequest);
     }
 
-    // Returns all vacation requests for a given employee.
+    // Retorna todas las solicitudes de vacaciones de un empleado.
     public List<VacationRequest> findByEmployee(Long employeeId) {
         return vacationRepository.findByEmployeeId(employeeId);
     }

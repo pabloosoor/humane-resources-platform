@@ -10,8 +10,8 @@ import com.uda.hrplatform.utils.ConnectionManager;
 
 import java.util.List;
 
-// Wires all dependencies: repositories -> services -> controllers.
-// To add a new feature: create its repo, service, and controller here.
+// Conecta todas las dependencias: repositorios -> servicios -> controladores.
+// Para agregar una funcionalidad: crear su repo, service y controller acá.
 public class AppConfig {
 
     private final EmployeeController employeeController;
@@ -22,13 +22,13 @@ public class AppConfig {
     public AppConfig() {
         ConnectionManager connectionManager = new ConnectionManager();
 
-        // Repositories — one per table
+        // Repositorios — uno por tabla
         var employeeRepo   = new EmployeeJdbcRepository(connectionManager);
         var vacationRepo   = new VacationJdbcRepository(connectionManager);
         var bonusRepo      = new BonusJdbcRepository(connectionManager);
         var attendanceRepo = new AttendanceJdbcRepository(connectionManager);
 
-        // Services — inject repos and OCP strategies
+        // Servicios — inyectan repos y estrategias OCP
         var employeeService   = new EmployeeService(employeeRepo);
         var vacationService   = new VacationService(employeeRepo, vacationRepo,
                 List.of(new StandardVacationPolicy()));
@@ -37,7 +37,7 @@ public class AppConfig {
         var attendanceService = new AttendanceBonusService(attendanceRepo, employeeRepo, bonusRepo,
                 new StandardAttendanceBonusCalculator());
 
-        // Controllers — inject services
+        // Controladores — inyectan servicios
         this.employeeController   = new EmployeeController(employeeService);
         this.vacationController   = new VacationController(vacationService);
         this.bonusController      = new BonusController(bonusService);

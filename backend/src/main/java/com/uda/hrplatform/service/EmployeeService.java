@@ -15,18 +15,18 @@ public class EmployeeService {
         this.repository = repository;
     }
 
-    // Returns all active employees.
+    // Retorna todos los empleados activos.
     public List<Employee> findActives() {
         return repository.findActives();
     }
 
-    // Returns a single employee or throws if not found.
+    // Retorna un empleado por ID o lanza excepción si no existe.
     public Employee findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found: " + id));
     }
 
-    // Creates an employee with 14 vacation days by default.
+    // Crea un empleado con 14 días de vacaciones por defecto.
     public Employee create(CreateEmployeeRequest req) {
         Employee employee = new Employee();
         employee.setFirstName(req.firstName());
@@ -40,7 +40,7 @@ public class EmployeeService {
         return repository.save(employee);
     }
 
-    // Updates only the fields present in the request (null = keep current value).
+    // Actualiza solo los campos presentes en el request (null = sin cambio).
     public Employee update(Long id, UpdateEmployeeRequest req) {
         Employee employee = findById(id);
 
@@ -54,7 +54,7 @@ public class EmployeeService {
         return employee;
     }
 
-    // Soft deletes the employee (sets active = false).
+    // Baja lógica del empleado (active = false).
     public void deactivate(Long id) {
         findById(id);
         repository.deactivate(id);

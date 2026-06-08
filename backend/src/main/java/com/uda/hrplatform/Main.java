@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        // Wire all dependencies and register all routes
+        // Conecta dependencias e inicializa rutas
         AppConfig config = new AppConfig();
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);

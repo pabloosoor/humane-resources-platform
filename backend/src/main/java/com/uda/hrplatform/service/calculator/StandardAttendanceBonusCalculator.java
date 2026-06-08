@@ -8,7 +8,7 @@ import java.util.List;
 
 public class StandardAttendanceBonusCalculator implements AttendanceBonusCalculator {
 
-    // 10% of base salary if no unjustified absences; zero otherwise.
+    // 10% del salario si no hay ausencias injustificadas; cero si las hay.
     @Override
     public BigDecimal calculate(Employee employee, List<AttendanceRecord> records) {
         long unjustified = records.stream()

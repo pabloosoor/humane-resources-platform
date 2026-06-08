@@ -29,7 +29,7 @@ public class AttendanceBonusService {
         this.calculator = calculator;
     }
 
-    // Registers a single attendance day. Fails fast if already registered for that date.
+    // Registra la asistencia de un día. Falla rápido si ya existe registro para esa fecha.
     public AttendanceRecord register(Long employeeId, RegisterAttendanceRequest req) {
         if (attendanceRepository.existsByEmployeeAndDate(employeeId, req.date())) {
             throw new RuntimeException("Attendance already registered for " + req.date());
@@ -43,7 +43,7 @@ public class AttendanceBonusService {
         return attendanceRepository.save(record);
     }
 
-    // Calculates the attendance bonus for a period (format: YYYY-MM). Saves result as a bonus record.
+    // Calcula el bono de presentismo del período (formato: YYYY-MM) y lo guarda como bonus record.
     public BonusRecord calculateBonus(Long employeeId, String period) {
         if (bonusRepository.existsByEmployeeAndTypeAndPeriod(employeeId, BonusType.ATTENDANCE_BONUS, period)) {
             throw new RuntimeException("Attendance bonus already calculated for period " + period);
@@ -67,7 +67,7 @@ public class AttendanceBonusService {
         return bonusRepository.save(bonus);
     }
 
-    // Returns all attendance records for an employee within a period (format: YYYY-MM).
+    // Retorna los registros de asistencia de un empleado en el período indicado.
     public List<AttendanceRecord> findByEmployeeAndPeriod(Long employeeId, String period) {
         YearMonth ym = YearMonth.parse(period);
         return attendanceRepository.findByEmployeeAndPeriod(employeeId, ym.atDay(1), ym.atEndOfMonth());

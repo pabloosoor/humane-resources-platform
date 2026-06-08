@@ -24,7 +24,7 @@ public class BonusService {
         this.calculators = calculators;
     }
 
-    // Calculates and saves a bonus. Fails fast if already calculated for that period.
+    // Calcula y guarda un bono. Falla rápido si ya existe uno para ese período.
     public BonusRecord calculate(Long employeeId, CalculateBonusRequest req) {
         if (bonusRepository.existsByEmployeeAndTypeAndPeriod(employeeId, req.bonusType(), req.period())) {
             throw new RuntimeException("Bonus already calculated for employee " + employeeId
@@ -49,7 +49,7 @@ public class BonusService {
         return bonusRepository.save(record);
     }
 
-    // Returns all bonus records for a given employee.
+    // Retorna todos los bonos registrados de un empleado.
     public List<BonusRecord> findByEmployee(Long employeeId) {
         return bonusRepository.findByEmployeeId(employeeId);
     }

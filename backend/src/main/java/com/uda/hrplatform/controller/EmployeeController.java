@@ -17,12 +17,12 @@ public class EmployeeController {
         this.service = service;
     }
 
-    // GET /api/employees — returns all active employees
+    // GET /api/employees — retorna todos los empleados activos
     public void findAll(HttpExchange exchange, Map<String, String> vars) throws IOException {
         HttpUtils.sendJson(exchange, 200, service.findActives());
     }
 
-    // GET /api/employees/{id} — returns a single employee or 404 if not found
+    // GET /api/employees/{id} — retorna un empleado o 404 si no existe
     public void findById(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long id = Long.parseLong(vars.get("id"));
@@ -32,7 +32,7 @@ public class EmployeeController {
         }
     }
 
-    // POST /api/employees — creates a new employee from the request body
+    // POST /api/employees — crea un nuevo empleado con los datos del body
     public void create(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             CreateEmployeeRequest req = HttpUtils.readBody(exchange, CreateEmployeeRequest.class);
@@ -42,7 +42,7 @@ public class EmployeeController {
         }
     }
 
-    // PUT /api/employees/{id} — updates only the fields present in the body
+    // PUT /api/employees/{id} — actualiza solo los campos presentes en el body
     public void update(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long id = Long.parseLong(vars.get("id"));
@@ -53,7 +53,7 @@ public class EmployeeController {
         }
     }
 
-    // DELETE /api/employees/{id} — soft deletes the employee (sets active = false)
+    // DELETE /api/employees/{id} — baja lógica del empleado (active = false)
     public void deactivate(HttpExchange exchange, Map<String, String> vars) throws IOException {
         try {
             Long id = Long.parseLong(vars.get("id"));
