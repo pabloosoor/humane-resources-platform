@@ -1,0 +1,12 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'com.uda.hrplatform.Main'
+}
+
+dependencies {
+    implementation project(':access-data')
+    implementation 'com.google.code.gson:gson:2.10.1'
+}

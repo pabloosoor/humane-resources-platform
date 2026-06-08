@@ -4,7 +4,6 @@ import com.uda.hrplatform.model.BonusType;
 import com.uda.hrplatform.model.Employee;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -19,7 +18,8 @@ public class SeniorityBonusCalculator implements BonusCalculator {
     @Override
     public BigDecimal calculate(Employee employee, String period) {
         int years = Period.between(employee.getHireDate(), LocalDate.now()).getYears();
-        BigDecimal rate = BigDecimal.valueOf(years).multiply(BigDecimal.valueOf(0.01));
-        return employee.getBaseSalary().multiply(rate).setScale(2, RoundingMode.HALF_UP);
+        return employee.getBaseSalary()
+                .multiply(BigDecimal.valueOf(years))
+                .multiply(new BigDecimal("0.01"));
     }
 }

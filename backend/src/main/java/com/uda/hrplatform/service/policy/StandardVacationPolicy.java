@@ -13,16 +13,13 @@ public class StandardVacationPolicy implements VacationPolicy {
         return true;
     }
 
-    // Validates balance and returns approval with remaining days.
     @Override
     public VacationApproval apply(Employee employee, int requestedDays, LocalDate startDate) {
         if (requestedDays <= 0) {
             return new VacationApproval(false, "Requested days must be greater than zero.", employee.getVacationDays());
         }
         if (requestedDays > employee.getVacationDays()) {
-            return new VacationApproval(false,
-                    "Insufficient balance. Available: " + employee.getVacationDays(),
-                    employee.getVacationDays());
+            return new VacationApproval(false, "Insufficient vacation days. Available: " + employee.getVacationDays(), employee.getVacationDays());
         }
         return new VacationApproval(true, "Vacation approved.", employee.getVacationDays() - requestedDays);
     }
